@@ -20,6 +20,9 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private static final int GRID_BORDER_COLOR = Color.RED;
     private static final int CHART_LINE_COLOR = Color.RED;
     private static final int AXIS_LABEL_COLOR = Color.GREEN;
+    private static final int AXIS_LABEL_COLOR_RED = Color.parseColor("#ff2d19");
+    private static final int AXIS_LABEL_COLOR_WHITE = Color.parseColor("#bdbec1");
+    private static final int AXIS_LABEL_COLOR_GREEN = Color.parseColor("#33fd33");
 
     private SurfaceHolder holder;
     private Canvas canvas;
@@ -30,8 +33,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private Thread thread;
     private boolean isRunning;
 
-    private int horizontalLinesNumber = 6;
-    private int verticalLinesNumber = 16;
+    private int horizontalLinesNumber = 7;
+    private int verticalLinesNumber = 17;
     private float preClose = 6003.2f;
     private float diff = 103.2f;
     private final float PADDING_VALUE = 30f;
@@ -170,14 +173,14 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void drawHorizontalLines(Canvas canvas) {
-        float cellHeight = contentHeight / horizontalLinesNumber;
+        float cellHeight = contentHeight / (horizontalLinesNumber - 1);
 
         paint.setColor(GRID_BORDER_COLOR);
         canvas.drawLine(0, 0, getWidth(), 0, paint);
         drawLeftAxisLabel(0, 0, -axisLabelAscent, canvas);
 
         paint.setColor(GRID_LINE_COLOR);
-        for (int i = 1; i < horizontalLinesNumber; i++) {
+        for (int i = 1; i <= horizontalLinesNumber - 2; i++) {
             canvas.drawLine(0, i * cellHeight, getWidth(), i * cellHeight, paint);
             drawLeftAxisLabel(i, 0, i * cellHeight - (axisLabelAscent + axisLabelDecent) / 2, canvas);
         }
@@ -189,14 +192,14 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     Rect textRect = new Rect();
     private void drawVerticalLines(Canvas canvas) {
-        float cellWidth = getWidth() / verticalLinesNumber;
+        float cellWidth = getWidth() / (verticalLinesNumber - 1);
 
         paint.setColor(GRID_BORDER_COLOR);
         canvas.drawLine(0, 0, 0, contentHeight, paint);
         drawBottomAxisLabel(0, 0, getHeight(), canvas);
 
         paint.setColor(GRID_LINE_COLOR);
-        for (int i = 1; i < verticalLinesNumber; i++) {
+        for (int i = 1; i <= verticalLinesNumber - 2; i++) {
             canvas.drawLine(i * cellWidth, 0, i * cellWidth, contentHeight, paint);
             String bottomAxisValue = String.valueOf(bottomAxisValues[i]);
             axisLabelPaint.getTextBounds(bottomAxisValue, 0, bottomAxisValue.length(), textRect);
@@ -246,6 +249,14 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void drawLeftAxisLabel(int position, float x, float y, Canvas canvas) {
+        int middle = horizontalLinesNumber / 2;
+        if (position == middle) {
+            axisLabelPaint.setColor(AXIS_LABEL_COLOR_WHITE);
+        } else if (position > middle) {
+            axisLabelPaint.setColor(AXIS_LABEL_COLOR_GREEN);
+        } else {
+            axisLabelPaint.setColor(AXIS_LABEL_COLOR_RED);
+        }
         canvas.drawText(String.valueOf(leftAxisValues[position]), x, y, axisLabelPaint);
     }
 
