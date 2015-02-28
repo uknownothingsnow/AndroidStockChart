@@ -178,16 +178,20 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         paint.setColor(GRID_BORDER_COLOR);
         canvas.drawLine(0, 0, getWidth(), 0, paint);
         drawLeftAxisLabel(0, 0, -axisLabelAscent, canvas);
+        drawRightAxisLabel(0, -axisLabelAscent, canvas);
 
         paint.setColor(GRID_LINE_COLOR);
         for (int i = 1; i <= horizontalLinesNumber - 2; i++) {
             canvas.drawLine(0, i * cellHeight, getWidth(), i * cellHeight, paint);
-            drawLeftAxisLabel(i, 0, i * cellHeight - (axisLabelAscent + axisLabelDecent) / 2, canvas);
+            float labelY = i * cellHeight - (axisLabelAscent + axisLabelDecent) / 2;
+            drawLeftAxisLabel(i, 0, labelY, canvas);
+            drawRightAxisLabel(i, labelY, canvas);
         }
 
         paint.setColor(GRID_BORDER_COLOR);
         canvas.drawLine(0, contentHeight - 1, getWidth(), contentHeight - 1, paint);
         drawLeftAxisLabel(horizontalLinesNumber - 1, 0, contentHeight - 1, canvas);
+        drawRightAxisLabel(horizontalLinesNumber - 1, contentHeight - 1, canvas);
     }
 
     Rect textRect = new Rect();
@@ -257,7 +261,23 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         } else {
             axisLabelPaint.setColor(AXIS_LABEL_COLOR_RED);
         }
-        canvas.drawText(String.valueOf(leftAxisValues[position]), x, y, axisLabelPaint);
+        String text = String.format("%.02f", leftAxisValues[position]);
+        canvas.drawText(text, x, y, axisLabelPaint);
+    }
+
+    private void drawRightAxisLabel(int position, float y, Canvas canvas) {
+        int middle = horizontalLinesNumber / 2;
+        if (position == middle) {
+            axisLabelPaint.setColor(AXIS_LABEL_COLOR_WHITE);
+        } else if (position > middle) {
+            axisLabelPaint.setColor(AXIS_LABEL_COLOR_GREEN);
+        } else {
+            axisLabelPaint.setColor(AXIS_LABEL_COLOR_RED);
+        }
+        float percent = Math.abs((leftAxisValues[position] - preClose) / preClose * 100);
+        String text = String.format("%.02f", percent) + "%";
+        axisLabelPaint.getTextBounds(text, 0, text.length(), textRect);
+        canvas.drawText(text, getWidth() - textRect.width(), y, axisLabelPaint);
     }
 
     private void drawBottomAxisLabel(int position, float x, float y, Canvas canvas) {
