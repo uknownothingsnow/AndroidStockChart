@@ -210,9 +210,13 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         drawRightAxisLabel(horizontalLinesNumber - 1, contentHeight - 1, canvas);
     }
 
+    private float getCellWidth() {
+        return getWidth() / (verticalLinesNumber - 1);
+    }
+
     Rect textRect = new Rect();
     private void drawVerticalLines(Canvas canvas) {
-        float cellWidth = getWidth() / (verticalLinesNumber - 1);
+        float cellWidth = getCellWidth();
 
         paint.setColor(GRID_BORDER_COLOR);
         canvas.drawLine(0, 0, 0, contentHeight, paint);
@@ -222,8 +226,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         for (int i = 1; i <= verticalLinesNumber - 2; i++) {
             canvas.drawLine(i * cellWidth, 0, i * cellWidth, contentHeight, paint);
             String bottomAxisValue = String.valueOf(bottomAxisValues[i]);
-            axisLabelPaint.getTextBounds(bottomAxisValue, 0, bottomAxisValue.length(), textRect);
-            drawBottomAxisLabel(i, i * cellWidth - axisLabelPaint.measureText("00:00", 0, 5) / 2, getHeight(), canvas);
+            drawBottomAxisLabel(i, i * cellWidth - axisLabelPaint.measureText(bottomAxisValue, 0, 5) / 2, getHeight(), canvas);
         }
 
         paint.setColor(GRID_BORDER_COLOR);
@@ -244,9 +247,10 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         path.reset();
     }
 
-    private float computeRawX(float x) {
+    private float computeRawX(long x) {
         long start = points.get(0).x;
-        return (x - start) / (float) xStepSize / (float) verticalLinesNumber * getWidth();
+        float cellPosition =  (x - start) / (float) xStepSize;
+        return cellPosition * getCellWidth();
     }
 
     private float computeRawY(float y) {
