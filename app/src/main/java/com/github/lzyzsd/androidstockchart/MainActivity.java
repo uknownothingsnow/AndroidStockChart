@@ -103,13 +103,27 @@ public class MainActivity extends ActionBarActivity {
 
     private ArrayList<Point> convertQuotesToPoints(ArrayList<QuoteData> quotes, float preClose) {
         ArrayList<Point> points = new ArrayList<>(quotes.size());
-        boolean shouldThrowZero = false;
-        for (QuoteData quoteData : quotes) {
-            if (quoteData.open > 0) {
-                shouldThrowZero = true;
-                points.add(new Point(quoteData.updateTime.getMillis(), quoteData.open));
-            } else if (!shouldThrowZero) {
-                points.add(new Point(quoteData.updateTime.getMillis(), preClose));
+        //数据最前面的零值需要设置为第一个非零值6
+        int firstNonZeroPosition = 0;
+        float firstNonZeroValue = -1;
+
+        for (int i = 0; i < quotes.size(); i++) {
+            if (quotes.get(i).open > 0) {
+                firstNonZeroPosition = i;
+                firstNonZeroValue = quotes.get(i).open;
+                break;
+            }
+        }
+
+        for (int i = 0; i < quotes.size(); i++) {
+            QuoteData quoteData = quotes.get(i);
+            if (i > firstNonZeroPosition) {
+                //数据中间的零值需要丢弃
+                if (quoteData.open > 0) {
+                    points.add(new Point(quoteData.updateTime.getMillis(), quoteData.open));
+                }
+            } else {
+                points.add(new Point(quoteData.updateTime.getMillis(), firstNonZeroValue));
             }
         }
 
