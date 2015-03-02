@@ -11,8 +11,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -49,7 +47,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     float min = preClose - diff - PADDING_VALUE;
     float max = preClose + diff + PADDING_VALUE;
 
-    private List<Point> points = new ArrayList<>();
+    private List<Line> lines = new ArrayList<>();
 
     private int axisLabelTextSize = 24;
     private float axisLabelAscent;
@@ -76,8 +74,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         this.preClose = preClose;
     }
 
-    public void setPoints(List<Point> points) {
-        this.points = points;
+    public void setLines(List<Line> lines) {
+        this.lines = lines;
         setMinMaxValue();
         generateLeftAxisValues();
         generateBottomAxisValues();
@@ -85,12 +83,14 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     private void setMinMaxValue() {
         float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
-        for (Point point : points) {
-            if (point.y < min && point.y > 0) {
-                min = point.y;
-            }
-            if (point.y > max) {
-                max = point.y;
+        for (Line line: lines) {
+            for (Point point : line.getPoints()) {
+                if (point.y < min && point.y > 0) {
+                    min = point.y;
+                }
+                if (point.y > max) {
+                    max = point.y;
+                }
             }
         }
 
@@ -145,7 +145,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     public void run() {
         while (isRunning )
         {
-            if (points.size() == 0) {
+            if (lines.size() == 0) {
                 try {
                     thread.sleep(100);
                 } catch (InterruptedException e) {
@@ -179,7 +179,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
                 canvas.drawRect(0, 0, getWidth(), getHeight(), paint);
                 drawHorizontalLines(canvas);
                 drawVerticalLines(canvas);
-                drawPoints(canvas);
+                drawLines(canvas);
             }
         } finally {
             if (canvas != null) {
@@ -236,8 +236,15 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         drawBottomAxisLabel(verticalLinesNumber - 1, getWidth() - axisLabelPaint.measureText("00:00", 0, 5) - 1, getHeight(), canvas);
     }
 
+    private void drawLines(Canvas canvas) {
+        for (Line line : lines) {
+            chartLinePaint.setColor(line.getColor());
+            drawPoints(canvas, line.getPoints());
+        }
+    }
+
     Path path = new Path();
-    private void drawPoints(Canvas canvas) {
+    private void drawPoints(Canvas canvas, List<Point> points) {
         path.moveTo(computeRawX(points.get(0).x), computeRawY(points.get(0).y));
         for (int i = 1; i < points.size(); i++) {
             path.lineTo(computeRawX(points.get(i).x), computeRawY(points.get(i).y));
@@ -248,7 +255,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private float computeRawX(long x) {
-        long start = points.get(0).x;
+        long start = lines.get(0).getPoints().get(0).x;
         float cellPosition =  (x - start) / (float) xStepSize;
         return cellPosition * getCellWidth();
     }
@@ -272,7 +279,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void generateBottomAxisValues() {
-        long start = points.get(0).x;
+        long start = lines.get(0).getPoints().get(0).x;
         for (int i = 0; i < bottomAxisValues.length; i++) {
             bottomAxisValues[i] = start + xStepSize * i;
         }
