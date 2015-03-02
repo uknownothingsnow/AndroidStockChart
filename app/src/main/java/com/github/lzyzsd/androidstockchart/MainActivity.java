@@ -1,5 +1,6 @@
 package com.github.lzyzsd.androidstockchart;
 
+import android.graphics.Color;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -14,6 +15,7 @@ import com.google.gson.internal.bind.DateTypeAdapter;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -66,7 +68,7 @@ public class MainActivity extends ActionBarActivity {
             public void run() {
                 runOnUiThread(runnable);
             }
-        }, 0, 60_000);
+        }, 0, 10_000);
     }
 
     private void fetch(final LineChartView chartView, QuoteService quoteService) {
@@ -87,7 +89,14 @@ public class MainActivity extends ActionBarActivity {
                     public void onNext(QuoteDataList quoteDataList) {
                         progressBar.setVisibility(View.GONE);
                         chartView.setPreClose(quoteDataList.info.preclose);
-                        chartView.setPoints(convertQuotesToPoints(quoteDataList.data, quoteDataList.info.preclose));
+                        List<Line> lines = new ArrayList<>();
+                        List<Point> points = convertQuotesToPoints(quoteDataList.data, quoteDataList.info.preclose);
+                        Line line = new Line(points);
+                        lines.add(line);
+                        Line avgLine = AvgComputator.getAvgLine(line);
+                        avgLine.setColor(Color.BLUE);
+                        lines.add(avgLine);
+                        chartView.setLines(lines);
                     }
                 });
     }
