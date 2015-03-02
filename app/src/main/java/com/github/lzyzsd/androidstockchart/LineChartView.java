@@ -5,11 +5,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PathEffect;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by Bruce on 2/27/15.
@@ -34,14 +38,18 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private boolean isRunning;
 
     private int horizontalLinesNumber = 7;
-    private int verticalLinesNumber = 17;
-    private float preClose = 6003.2f;
-    private float diff = 103.2f;
+    private int verticalLinesNumber = 12;
+    private float preClose = 3257f;
+    private float diff = 0;
     private final float PADDING_VALUE = 30f;
     private float[] leftAxisValues = new float[horizontalLinesNumber];
-    private float[] bottomAxisValues = new float[verticalLinesNumber];
+    private long[] bottomAxisValues = new long[verticalLinesNumber];
+    private long xStepSize = 7200000;
 
-    private Point[] points = new Point[200];
+    float min = preClose - diff - PADDING_VALUE;
+    float max = preClose + diff + PADDING_VALUE;
+
+    private List<Point> points = new ArrayList<>();
 
     private int axisLabelTextSize = 24;
     private float axisLabelAscent;
@@ -64,36 +72,36 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         holder.addCallback(this);
     }
 
-    private void initPoints() {
-        float base;
-        for (int i = 0; i < points.length; i++) {
-            if (i % 2 == 0) {
-                base = -diff;
-            } else {
-                base = diff;
+    public void setPreClose(float preClose) {
+        this.preClose = preClose;
+    }
+
+    public void setPoints(List<Point> points) {
+        this.points = points;
+        setMinMaxValue();
+        generateLeftAxisValues();
+        generateBottomAxisValues();
+    }
+
+    private void setMinMaxValue() {
+        float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
+        for (Point point : points) {
+            if (point.y < min && point.y > 0) {
+                min = point.y;
             }
-            float randomY = (float) Math.random() * base + preClose;
-            float randomX = (float) Math.random() * verticalLinesNumber;
-            points[i] = new Point(randomX, randomY);
+            if (point.y > max) {
+                max = point.y;
+            }
         }
 
-        for (int i = 0; i < points.length; i++) {
-            for (int j = i; j < points.length; j++) {
-                if (points[j].x < points[i].x) {
-                    Point temp = points[i];
-                    points[i] = points[j];
-                    points[j] = temp;
-                }
-            }
-        }
+        diff = Math.max(Math.abs(min - preClose), Math.abs(max - preClose));
+
+        this.min = preClose - diff - PADDING_VALUE;
+        this.max = preClose + diff + PADDING_VALUE;
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        generateLeftAxisValues();
-        generateBottomAxisValues();
-        initPoints();
-
         paint = new Paint();
         paint.setColor(DEFAULT_BACKGROUND_COLOR);
 
@@ -135,8 +143,16 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void run() {
-        while (isRunning)
+        while (isRunning )
         {
+            if (points.size() == 0) {
+                try {
+                    thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                continue;
+            }
             long start = System.currentTimeMillis();
             draw();
             long end = System.currentTimeMillis();
@@ -207,21 +223,21 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
             canvas.drawLine(i * cellWidth, 0, i * cellWidth, contentHeight, paint);
             String bottomAxisValue = String.valueOf(bottomAxisValues[i]);
             axisLabelPaint.getTextBounds(bottomAxisValue, 0, bottomAxisValue.length(), textRect);
-            drawBottomAxisLabel(i, i * cellWidth - textRect.width() / 2, getHeight(), canvas);
+            drawBottomAxisLabel(i, i * cellWidth - axisLabelPaint.measureText("00:00", 0, 5) / 2, getHeight(), canvas);
         }
 
         paint.setColor(GRID_BORDER_COLOR);
         canvas.drawLine(getWidth() - 1, 0, getWidth() - 1, contentHeight, paint);
         String lastBottomAxisValue = String.valueOf(bottomAxisValues[verticalLinesNumber - 1]);
         axisLabelPaint.getTextBounds(lastBottomAxisValue, 0, lastBottomAxisValue.length(), textRect);
-        drawBottomAxisLabel(verticalLinesNumber - 1, getWidth() - textRect.width() - 1, getHeight(), canvas);
+        drawBottomAxisLabel(verticalLinesNumber - 1, getWidth() - axisLabelPaint.measureText("00:00", 0, 5) - 1, getHeight(), canvas);
     }
 
     Path path = new Path();
     private void drawPoints(Canvas canvas) {
-        path.moveTo(computeRawX(points[0].x), computeRawY(points[0].y));
-        for (int i = 1; i < points.length; i++) {
-            path.lineTo(computeRawX(points[i].x), computeRawY(points[i].y));
+        path.moveTo(computeRawX(points.get(0).x), computeRawY(points.get(0).y));
+        for (int i = 1; i < points.size(); i++) {
+            path.lineTo(computeRawX(points.get(i).x), computeRawY(points.get(i).y));
         }
 
         canvas.drawPath(path, chartLinePaint);
@@ -229,26 +245,32 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private float computeRawX(float x) {
-        return x / (float) verticalLinesNumber * getWidth();
+        long start = points.get(0).x;
+        return (x - start) / (float) xStepSize / (float) verticalLinesNumber * getWidth();
     }
 
     private float computeRawY(float y) {
-        return (y - min) / (max - min) * contentHeight;
+        return (max - y) / (max - min) * contentHeight;
     }
-
-    float min = preClose - diff - PADDING_VALUE;
-    float max = preClose + diff + PADDING_VALUE;
 
     private void generateLeftAxisValues() {
         float step = (max - min) / horizontalLinesNumber;
-        for (int i = 0; i < leftAxisValues.length; i++) {
-            leftAxisValues[i] = min + i * step;
+
+        leftAxisValues[0] = max;
+        leftAxisValues[leftAxisValues.length - 1] = min;
+        int middle = leftAxisValues.length / 2;
+        leftAxisValues[middle] = preClose;
+
+        for (int i = 1; i < middle; i++) {
+            leftAxisValues[middle - i] = max + i * step;
+            leftAxisValues[middle + i] = max - i * step;
         }
     }
 
     private void generateBottomAxisValues() {
+        long start = points.get(0).x;
         for (int i = 0; i < bottomAxisValues.length; i++) {
-            bottomAxisValues[i] = i;
+            bottomAxisValues[i] = start + xStepSize * i;
         }
     }
 
@@ -281,6 +303,6 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     private void drawBottomAxisLabel(int position, float x, float y, Canvas canvas) {
-        canvas.drawText(String.valueOf(bottomAxisValues[position]), x, y, axisLabelPaint);
+        canvas.drawText(DateUtil.format_hh_mm(bottomAxisValues[position]), x, y, axisLabelPaint);
     }
 }
