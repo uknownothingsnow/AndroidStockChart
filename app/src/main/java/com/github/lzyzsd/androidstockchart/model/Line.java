@@ -1,6 +1,8 @@
-package com.github.lzyzsd.androidstockchart;
+package com.github.lzyzsd.androidstockchart.model;
 
 import android.graphics.Color;
+
+import com.github.lzyzsd.androidstockchart.Point;
 
 import java.util.ArrayList;
 import java.util.List;

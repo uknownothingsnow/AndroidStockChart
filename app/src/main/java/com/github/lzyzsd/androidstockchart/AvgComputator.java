@@ -1,5 +1,7 @@
 package com.github.lzyzsd.androidstockchart;
 
+import com.github.lzyzsd.androidstockchart.model.Line;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -8,9 +8,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.github.lzyzsd.androidstockchart.model.Axis;
+import com.github.lzyzsd.androidstockchart.model.Line;
+import com.github.lzyzsd.androidstockchart.model.LineChartData;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.internal.bind.DateTypeAdapter;
 
 import org.joda.time.DateTime;
 
@@ -18,15 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
 import retrofit.converter.GsonConverter;
-import rx.Observable;
 import rx.Subscriber;
 import rx.android.observables.AndroidObservable;
-import rx.functions.Func1;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -72,7 +71,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void fetch(final LineChartView chartView, QuoteService quoteService) {
-        AndroidObservable.bindActivity(this, quoteService.getQuote("TPME.XAGUSD", 1, "20140701120000"))
+        String dateStr = DateTime.now().toString("YYYYMMDDHHmmss");
+        AndroidObservable.bindActivity(this, quoteService.getQuote("TPME.XAGUSD", 1, dateStr))
                 .subscribe(new Subscriber<QuoteDataList>() {
                     @Override
                     public void onCompleted() {
@@ -96,7 +96,12 @@ public class MainActivity extends ActionBarActivity {
                         Line avgLine = AvgComputator.getAvgLine(line);
                         avgLine.setColor(Color.BLUE);
                         lines.add(avgLine);
-                        chartView.setLines(lines);
+                        LineChartData lineChartData = new LineChartData(lines);
+                        Axis leftAxis = new Axis();
+                        Axis bottomAxis = new Axis();
+                        lineChartData.setAxisYLeft(leftAxis);
+                        lineChartData.setAxisXBottom(bottomAxis);
+                        chartView.setChartData(lineChartData);
                     }
                 });
     }
