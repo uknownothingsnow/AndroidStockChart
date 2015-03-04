@@ -2,6 +2,8 @@ package com.github.lzyzsd.androidstockchart.model;
 
 import android.graphics.Color;
 
+import com.github.lzyzsd.androidstockchart.formatter.AxisValueFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +14,7 @@ public class Axis {
     private List<AxisValue> values = new ArrayList<>();
     private int lineColor = Color.LTGRAY;
     private float min, max, middle;
+    private AxisValueFormatter axisValueFormatter;
 
     public void Axis() {
 
@@ -63,5 +66,13 @@ public class Axis {
 
     public void setMiddle(float middle) {
         this.middle = middle;
+    }
+
+    public AxisValueFormatter getAxisValueFormatter() {
+        return axisValueFormatter;
+    }
+
+    public void setAxisValueFormatter(AxisValueFormatter axisValueFormatter) {
+        this.axisValueFormatter = axisValueFormatter;
     }
 }

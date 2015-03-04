@@ -3,6 +3,7 @@ package com.github.lzyzsd.androidstockchart;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 
 import com.github.lzyzsd.androidstockchart.model.Axis;
 import com.github.lzyzsd.androidstockchart.model.AxisValue;
@@ -127,7 +128,7 @@ public class AxisRenderer {
         paint.setColor(AXIS_BORDER_COLOR);
         canvas.drawLine(0, firstValue.getPosition(), chartView.getWidth(), firstValue.getPosition(), linePaints[LEFT]);
         drawLeftAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
-        drawRightAxisLabel(firstValue.getValue() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
+        drawRightAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
 
         paint.setColor(AXIS_LINE_COLOR);
         for (int i = 1; i < axis.getValues().size() - 1; i++) {
@@ -141,8 +142,8 @@ public class AxisRenderer {
         paint.setColor(AXIS_BORDER_COLOR);
         AxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
         canvas.drawLine(0, lastValue.getPosition(), chartView.getWidth(), lastValue.getPosition(), paint);
-        drawLeftAxisLabel(chartView.getContentHeight(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
-        drawRightAxisLabel(chartView.getContentHeight(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
+        drawLeftAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
+        drawRightAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
     }
 
     private void drawLeftAxisLabel(float y, float value, int color, Canvas canvas) {
@@ -158,36 +159,41 @@ public class AxisRenderer {
         axisLabelPaint.setColor(color);
         float percent = Math.abs((value - chartView.getPreClose()) / chartView.getPreClose() * 100);
         String text = String.format("%.02f", percent) + "%";
-        canvas.drawText(text, chartView.getWidth() - axisLabelPaint.measureText(text, 0, text.length() - 1), y, axisLabelPaint);
+        canvas.drawText(text, chartView.getWidth() - axisLabelPaint.measureText(text, 0, text.length()), y, axisLabelPaint);
     }
 
     public void drawVerticalLines(Canvas canvas) {
         Axis axis = chartView.getChartData().getAxisXBottom();
 
-        Paint paint = linePaints[BOTTOM];
+        Paint labelPaint = labelPaints[BOTTOM];
+        Paint linePaint = linePaints[BOTTOM];
 
         AxisValue firstValue = axis.getValues().get(0);
-        paint.setColor(AXIS_BORDER_COLOR);
-        canvas.drawLine(firstValue.getPosition(), 0, firstValue.getPosition(), chartView.getContentHeight(), paint);
-        drawBottomAxisLabel(0, 0, chartView.getHeight(), canvas);
+        linePaint.setColor(AXIS_BORDER_COLOR);
+        canvas.drawLine(firstValue.getPosition(), 0, firstValue.getPosition(), chartView.getContentHeight(), linePaint);
 
-        paint.setColor(AXIS_LINE_COLOR);
+        String text = axis.getAxisValueFormatter().format(firstValue);
+        drawBottomAxisLabel(text, firstValue.getPosition(), chartView.getHeight(), canvas);
+
+        linePaint.setColor(AXIS_LINE_COLOR);
         for (int i = 1; i < axis.getValues().size() - 1; i++) {
             AxisValue axisValue = axis.getValues().get(i);
-            canvas.drawLine(axisValue.getPosition(), 0, axisValue.getPosition(), chartView.getContentHeight(), paint);
-            String text = "00:00";
-            drawBottomAxisLabel(axisValue.getValue(), axisValue.getPosition() - paint.measureText(text, 0, text.length()) / 2, chartView.getHeight(), canvas);
+            canvas.drawLine(axisValue.getPosition(), 0, axisValue.getPosition(), chartView.getContentHeight(), linePaint);
+            text = axis.getAxisValueFormatter().format(axisValue);
+            float xShift = labelPaint.measureText(text, 0, text.length()) / 2;
+            drawBottomAxisLabel(text, axisValue.getPosition() - xShift, chartView.getHeight(), canvas);
         }
 
-        paint.setColor(AXIS_BORDER_COLOR);
+        linePaint.setColor(AXIS_BORDER_COLOR);
         AxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
-        canvas.drawLine(lastValue.getPosition(), 0, lastValue.getPosition(), chartView.getContentHeight(), paint);
-        String text = "00:00";
-        drawBottomAxisLabel(lastValue.getValue(), chartView.getWidth() - paint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);
+        canvas.drawLine(lastValue.getPosition(), 0, lastValue.getPosition(), chartView.getContentHeight(), linePaint);
+
+        text = axis.getAxisValueFormatter().format(lastValue);
+        drawBottomAxisLabel(text, chartView.getWidth() - labelPaint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);
     }
 
-    private void drawBottomAxisLabel(float value, float x, float y, Canvas canvas) {
-        canvas.drawText(DateUtil.format_hh_mm((long) value), x, y, labelPaints[BOTTOM]);
+    private void drawBottomAxisLabel(String text, float x, float y, Canvas canvas) {
+        canvas.drawText(text, x, y, labelPaints[BOTTOM]);
     }
 
     public float getBottomLabelHeight() {

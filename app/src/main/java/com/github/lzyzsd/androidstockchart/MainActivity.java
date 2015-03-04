@@ -8,7 +8,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.github.lzyzsd.androidstockchart.formatter.AxisValueFormatter;
 import com.github.lzyzsd.androidstockchart.model.Axis;
+import com.github.lzyzsd.androidstockchart.model.AxisValue;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 import com.google.gson.Gson;
@@ -99,6 +101,12 @@ public class MainActivity extends ActionBarActivity {
                         LineChartData lineChartData = new LineChartData(lines);
                         Axis leftAxis = new Axis();
                         Axis bottomAxis = new Axis();
+                        bottomAxis.setAxisValueFormatter(new AxisValueFormatter() {
+                            @Override
+                            public String format(AxisValue axisValue) {
+                                return DateUtil.format_hh_mm((long) axisValue.getValue());
+                            }
+                        });
                         lineChartData.setAxisYLeft(leftAxis);
                         lineChartData.setAxisXBottom(bottomAxis);
                         chartView.setChartData(lineChartData);
