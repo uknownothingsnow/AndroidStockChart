@@ -182,11 +182,11 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public float getCellWidth() {
-        return getWidth() / (verticalLinesNumber - 1);
+        return getWidth() / (float) (verticalLinesNumber - 1);
     }
 
     public float getCellHeight() {
-        return getContentHeight() / (horizontalLinesNumber - 1);
+        return getContentHeight() / (float) (horizontalLinesNumber - 1);
     }
 
     private void drawLines(Canvas canvas) {
