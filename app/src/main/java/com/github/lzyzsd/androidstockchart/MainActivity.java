@@ -9,10 +9,8 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.github.lzyzsd.androidstockchart.formatter.AxisValueFormatter;
-import com.github.lzyzsd.androidstockchart.model.XAxis;
-import com.github.lzyzsd.androidstockchart.model.XAxisValue;
-import com.github.lzyzsd.androidstockchart.model.YAxis;
-import com.github.lzyzsd.androidstockchart.model.YAxisValue;
+import com.github.lzyzsd.androidstockchart.model.Axis;
+import com.github.lzyzsd.androidstockchart.model.AxisValue;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 import com.github.lzyzsd.androidstockchart.util.XAxisUtil;
@@ -102,14 +100,14 @@ public class MainActivity extends ActionBarActivity {
                         avgLine.setColor(Color.BLUE);
                         lines.add(avgLine);
                         LineChartData lineChartData = new LineChartData(lines);
-                        YAxis leftYAxis = new YAxis();
-                        XAxis bottomAxis = new XAxis();
+                        Axis<Float> leftYAxis = new Axis<>();
+                        Axis<Long> bottomAxis = new Axis<>();
                         bottomAxis.setMin(XAxisUtil.getStartValue());
                         bottomAxis.setMax(XAxisUtil.getEndValue());
                         bottomAxis.setStep(XAxisUtil.getCellSize());
-                        bottomAxis.setAxisValueFormatter(new AxisValueFormatter<XAxisValue>() {
+                        bottomAxis.setAxisValueFormatter(new AxisValueFormatter<AxisValue<Long>>() {
                             @Override
-                            public String format(XAxisValue axisValue) {
+                            public String format(AxisValue<Long> axisValue) {
                                 return DateUtil.format_hh_mm(axisValue.getValue());
                             }
                         });

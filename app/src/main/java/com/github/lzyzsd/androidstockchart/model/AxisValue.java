@@ -1,25 +1,25 @@
 package com.github.lzyzsd.androidstockchart.model;
 
 /**
- * Created by Bruce on 3/3/15.
+ * Created by Bruce on 3/4/15.
  */
-public class YAxisValue {
-    private float value;
+public class AxisValue<T> {
+    private T value;
     private int labelColor;
     //对应坐标
     private float position;
 
-    public YAxisValue(float value, int lineColor, float position) {
+    public AxisValue(T value, int lineColor, float position) {
         setValue(value);
         setLabelColor(lineColor);
         setPosition(position);
     }
 
-    public float getValue() {
+    public T getValue() {
         return value;
     }
 
-    public void setValue(float value) {
+    public void setValue(T value) {
         this.value = value;
     }
 

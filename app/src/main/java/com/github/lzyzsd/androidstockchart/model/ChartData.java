@@ -4,40 +4,40 @@ package com.github.lzyzsd.androidstockchart.model;
  * Created by Bruce on 3/3/15.
  */
 public class ChartData {
-    protected XAxis axisXBottom;
-    protected YAxis axisYLeft;
-    protected XAxis axisXTop;
-    protected YAxis axisYRight;
+    protected Axis<Long> axisXBottom;
+    protected Axis<Float> axisYLeft;
+    protected Axis<Long> axisXTop;
+    protected Axis<Float> axisYRight;
 
-    public XAxis getAxisXBottom() {
+    public Axis<Long> getAxisXBottom() {
         return axisXBottom;
     }
 
-    public void setAxisXBottom(XAxis xAxisXBottom) {
+    public void setAxisXBottom(Axis xAxisXBottom) {
         this.axisXBottom = xAxisXBottom;
     }
 
-    public YAxis getAxisYLeft() {
+    public Axis<Float> getAxisYLeft() {
         return axisYLeft;
     }
 
-    public void setAxisYLeft(YAxis YAxisYLeft) {
-        this.axisYLeft = YAxisYLeft;
+    public void setAxisYLeft(Axis<Float> axisYLeft) {
+        this.axisYLeft = axisYLeft;
     }
 
-    public XAxis getAxisXTop() {
+    public Axis<Long> getAxisXTop() {
         return axisXTop;
     }
 
-    public void setAxisXTop(XAxis xAxisXTop) {
+    public void setAxisXTop(Axis<Long> xAxisXTop) {
         this.axisXTop = xAxisXTop;
     }
 
-    public YAxis getAxisYRight() {
+    public Axis<Float> getAxisYRight() {
         return axisYRight;
     }
 
-    public void setAxisYRight(YAxis YAxisYRight) {
-        this.axisYRight = YAxisYRight;
+    public void setAxisYRight(Axis<Float> axisYRight) {
+        this.axisYRight = axisYRight;
     }
 }

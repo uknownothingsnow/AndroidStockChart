@@ -8,19 +8,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Bruce on 3/3/15.
+ * Created by Bruce on 3/4/15.
  */
-public class YAxis {
-    private List<YAxisValue> values = new ArrayList<>();
+public class Axis<T> {
+    private List<AxisValue<T>> values = new ArrayList<>();
     private int lineColor = Color.LTGRAY;
-    private float min, max, step;
+    private long min, max, step;
     private AxisValueFormatter axisValueFormatter;
 
     public void Axis() {
 
     }
 
-    public void Axis(List<YAxisValue> values) {
+    public void Axis(List<AxisValue<T>> values) {
         if (values == null) {
             this.values = new ArrayList<>();
         } else {
@@ -28,11 +28,11 @@ public class YAxis {
         }
     }
 
-    public List<YAxisValue> getValues() {
+    public List<AxisValue<T>> getValues() {
         return values;
     }
 
-    public void setValues(List<YAxisValue> values) {
+    public void setValues(List<AxisValue<T>> values) {
         this.values = values;
     }
 
@@ -44,28 +44,32 @@ public class YAxis {
         this.lineColor = lineColor;
     }
 
-    public float getMin() {
+    public long getMin() {
         return min;
     }
 
-    public void setMin(float min) {
+    public void setMin(long min) {
         this.min = min;
     }
 
-    public float getMax() {
+    public long getMax() {
         return max;
     }
 
-    public void setMax(float max) {
+    public void setMax(long max) {
         this.max = max;
     }
 
-    public float getStep() {
+    public long getStep() {
         return step;
     }
 
-    public void setStep(float step) {
+    public void setStep(long step) {
         this.step = step;
+    }
+
+    public int getCellNumber() {
+        return (int) ((max - min) / step);
     }
 
     public AxisValueFormatter getAxisValueFormatter() {
