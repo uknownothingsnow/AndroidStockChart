@@ -30,12 +30,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private boolean isRunning;
 
     private int horizontalLinesNumber = 7;
-    private int verticalLinesNumber = 12;
     private float preClose = 3257f;
-    private float diff = 0;
-    private final float PADDING_VALUE = 30f;
     private float[] leftAxisValues = new float[horizontalLinesNumber];
-    private long[] bottomAxisValues = new long[verticalLinesNumber];
 
     private LineChartData chartData = new LineChartData();
 
@@ -83,16 +79,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         return horizontalLinesNumber;
     }
 
-    public int getVerticalLinesNumber() {
-        return verticalLinesNumber;
-    }
-
     public float[] getLeftAxisValues() {
         return leftAxisValues;
-    }
-
-    public long[] getBottomAxisValues() {
-        return bottomAxisValues;
     }
 
     public float getPreClose() {
@@ -182,7 +170,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public float getCellWidth() {
-        return getWidth() / (float) (verticalLinesNumber - 1);
+        return getWidth() / (float) getChartData().getAxisXBottom().getCellNumber();
     }
 
     public float getCellHeight() {

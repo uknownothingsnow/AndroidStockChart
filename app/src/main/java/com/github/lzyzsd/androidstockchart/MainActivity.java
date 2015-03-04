@@ -15,6 +15,7 @@ import com.github.lzyzsd.androidstockchart.model.YAxis;
 import com.github.lzyzsd.androidstockchart.model.YAxisValue;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
+import com.github.lzyzsd.androidstockchart.util.XAxisUtil;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -102,15 +103,18 @@ public class MainActivity extends ActionBarActivity {
                         lines.add(avgLine);
                         LineChartData lineChartData = new LineChartData(lines);
                         YAxis leftYAxis = new YAxis();
-                        XAxis bottomYAxis = new XAxis();
-                        bottomYAxis.setAxisValueFormatter(new AxisValueFormatter<XAxisValue>() {
+                        XAxis bottomAxis = new XAxis();
+                        bottomAxis.setMin(XAxisUtil.getStartValue());
+                        bottomAxis.setMax(XAxisUtil.getEndValue());
+                        bottomAxis.setStep(XAxisUtil.getCellSize());
+                        bottomAxis.setAxisValueFormatter(new AxisValueFormatter<XAxisValue>() {
                             @Override
                             public String format(XAxisValue axisValue) {
-                                return DateUtil.format_hh_mm((long) axisValue.getValue());
+                                return DateUtil.format_hh_mm(axisValue.getValue());
                             }
                         });
                         lineChartData.setAxisYLeft(leftYAxis);
-                        lineChartData.setAxisXBottom(bottomYAxis);
+                        lineChartData.setAxisXBottom(bottomAxis);
                         chartView.setChartData(lineChartData);
                     }
                 });

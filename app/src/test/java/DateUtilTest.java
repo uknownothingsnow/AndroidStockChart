@@ -27,6 +27,5 @@ public class DateUtilTest {
 
     @Test
     public void should_format_hh_mm_fail() {
-        DateTime dateTime = DateUtil.parse_yyyyddMM_hhmmss("20150227");
     }
 }

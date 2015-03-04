@@ -114,10 +114,10 @@ public class AxisRenderer {
         XAxis axis = chartData.getAxisXBottom();
         List<XAxisValue> values = axis.getValues();
         long start = chartData.getLines().get(0).getPoints().get(0).x;
-        for (int i = 0; i < chartView.getVerticalLinesNumber() - 1; i++) {
+        for (int i = 0; i < axis.getCellNumber(); i++) {
             values.add(new XAxisValue(start + i * xStepSize, AXIS_LINE_COLOR, i * chartView.getCellWidth()));
         }
-        int cells = chartView.getVerticalLinesNumber() - 1;
+        int cells = axis.getCellNumber();
         //最后一条垂直的线不x坐标减一，不然显示不出来
         values.add(new XAxisValue(start + cells * xStepSize, AXIS_LINE_COLOR, cells * chartView.getCellWidth() - 1));
     }
