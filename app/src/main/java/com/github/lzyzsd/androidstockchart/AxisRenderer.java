@@ -3,11 +3,11 @@ package com.github.lzyzsd.androidstockchart;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 
-import com.github.lzyzsd.androidstockchart.model.Axis;
-import com.github.lzyzsd.androidstockchart.model.AxisValue;
-import com.github.lzyzsd.androidstockchart.model.ChartData;
+import com.github.lzyzsd.androidstockchart.model.XAxis;
+import com.github.lzyzsd.androidstockchart.model.XAxisValue;
+import com.github.lzyzsd.androidstockchart.model.YAxis;
+import com.github.lzyzsd.androidstockchart.model.YAxisValue;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 
@@ -91,8 +91,8 @@ public class AxisRenderer {
     }
 
     public void generateLeftAxisValues() {
-        Axis axis = chartView.getChartData().getAxisYLeft();
-        List<AxisValue> values = axis.getValues();
+        YAxis axis = chartView.getChartData().getAxisYLeft();
+        List<YAxisValue> values = axis.getValues();
         float step = (max - min) / chartView.getHorizontalLinesNumber();
         int middle = chartView.getHorizontalLinesNumber() / 2;
 
@@ -105,29 +105,29 @@ public class AxisRenderer {
                     color = AXIS_LABEL_COLOR_GREEN;
                 }
             }
-            values.add(new AxisValue(max - i * step, color, chartView.getCellHeight() * i));
+            values.add(new YAxisValue(max - i * step, color, chartView.getCellHeight() * i));
         }
     }
 
     public void generateBottomAxisValues() {
         LineChartData chartData = chartView.getChartData();
-        Axis axis = chartData.getAxisXBottom();
-        List<AxisValue> values = axis.getValues();
+        XAxis axis = chartData.getAxisXBottom();
+        List<XAxisValue> values = axis.getValues();
         long start = chartData.getLines().get(0).getPoints().get(0).x;
         for (int i = 0; i < chartView.getVerticalLinesNumber() - 1; i++) {
-            values.add(new AxisValue(start + i * xStepSize, AXIS_LINE_COLOR, i * chartView.getCellWidth()));
+            values.add(new XAxisValue(start + i * xStepSize, AXIS_LINE_COLOR, i * chartView.getCellWidth()));
         }
         int cells = chartView.getVerticalLinesNumber() - 1;
         //最后一条垂直的线不x坐标减一，不然显示不出来
-        values.add(new AxisValue(start + cells * xStepSize, AXIS_LINE_COLOR, cells * chartView.getCellWidth() - 1));
+        values.add(new XAxisValue(start + cells * xStepSize, AXIS_LINE_COLOR, cells * chartView.getCellWidth() - 1));
     }
 
     public void drawHorizontalLines(Canvas canvas) {
-        Axis axis = chartView.getChartData().getAxisYLeft();
+        YAxis axis = chartView.getChartData().getAxisYLeft();
 
         Paint paint = linePaints[LEFT];
 
-        AxisValue firstValue = axis.getValues().get(0);
+        YAxisValue firstValue = axis.getValues().get(0);
         paint.setColor(AXIS_BORDER_COLOR);
         canvas.drawLine(0, firstValue.getPosition(), chartView.getWidth(), firstValue.getPosition(), linePaints[LEFT]);
         drawLeftAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
@@ -135,15 +135,15 @@ public class AxisRenderer {
 
         paint.setColor(AXIS_LINE_COLOR);
         for (int i = 1; i < axis.getValues().size() - 1; i++) {
-            AxisValue axisValue = axis.getValues().get(i);
-            float labelY = axisValue.getPosition() - (axisLabelAscent + axisLabelDecent) / 2;
-            canvas.drawLine(0, axisValue.getPosition(), chartView.getWidth(), axisValue.getPosition(), paint);
-            drawLeftAxisLabel(labelY, axisValue.getValue(), axisValue.getLabelColor(), canvas);
-            drawRightAxisLabel(labelY, axisValue.getValue(), axisValue.getLabelColor(), canvas);
+            YAxisValue YAxisValue = axis.getValues().get(i);
+            float labelY = YAxisValue.getPosition() - (axisLabelAscent + axisLabelDecent) / 2;
+            canvas.drawLine(0, YAxisValue.getPosition(), chartView.getWidth(), YAxisValue.getPosition(), paint);
+            drawLeftAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
+            drawRightAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
         }
 
         paint.setColor(AXIS_BORDER_COLOR);
-        AxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
+        YAxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
         canvas.drawLine(0, lastValue.getPosition(), chartView.getWidth(), lastValue.getPosition(), paint);
         drawLeftAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
         drawRightAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
@@ -166,12 +166,12 @@ public class AxisRenderer {
     }
 
     public void drawVerticalLines(Canvas canvas) {
-        Axis axis = chartView.getChartData().getAxisXBottom();
+        XAxis axis = chartView.getChartData().getAxisXBottom();
 
         Paint labelPaint = labelPaints[BOTTOM];
         Paint linePaint = linePaints[BOTTOM];
 
-        AxisValue firstValue = axis.getValues().get(0);
+        XAxisValue firstValue = axis.getValues().get(0);
         linePaint.setColor(AXIS_BORDER_COLOR);
         canvas.drawLine(firstValue.getPosition(), 0, firstValue.getPosition(), chartView.getContentHeight(), linePaint);
 
@@ -180,7 +180,7 @@ public class AxisRenderer {
 
         linePaint.setColor(AXIS_LINE_COLOR);
         for (int i = 1; i < axis.getValues().size() - 1; i++) {
-            AxisValue axisValue = axis.getValues().get(i);
+            XAxisValue axisValue = axis.getValues().get(i);
             canvas.drawLine(axisValue.getPosition(), 0, axisValue.getPosition(), chartView.getContentHeight(), linePaint);
             text = axis.getAxisValueFormatter().format(axisValue);
             float xShift = labelPaint.measureText(text, 0, text.length()) / 2;
@@ -188,7 +188,7 @@ public class AxisRenderer {
         }
 
         linePaint.setColor(AXIS_BORDER_COLOR);
-        AxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
+        XAxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
         canvas.drawLine(lastValue.getPosition(), 0, lastValue.getPosition(), chartView.getContentHeight(), linePaint);
 
         text = axis.getAxisValueFormatter().format(lastValue);

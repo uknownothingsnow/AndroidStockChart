@@ -10,17 +10,17 @@ import java.util.List;
 /**
  * Created by Bruce on 3/3/15.
  */
-public class Axis {
-    private List<AxisValue> values = new ArrayList<>();
+public class YAxis {
+    private List<YAxisValue> values = new ArrayList<>();
     private int lineColor = Color.LTGRAY;
-    private float min, max, middle;
+    private float min, max, step;
     private AxisValueFormatter axisValueFormatter;
 
     public void Axis() {
 
     }
 
-    public void Axis(List<AxisValue> values) {
+    public void Axis(List<YAxisValue> values) {
         if (values == null) {
             this.values = new ArrayList<>();
         } else {
@@ -28,11 +28,11 @@ public class Axis {
         }
     }
 
-    public List<AxisValue> getValues() {
+    public List<YAxisValue> getValues() {
         return values;
     }
 
-    public void setValues(List<AxisValue> values) {
+    public void setValues(List<YAxisValue> values) {
         this.values = values;
     }
 
@@ -60,12 +60,12 @@ public class Axis {
         this.max = max;
     }
 
-    public float getMiddle() {
-        return middle;
+    public float getStep() {
+        return step;
     }
 
-    public void setMiddle(float middle) {
-        this.middle = middle;
+    public void setStep(float step) {
+        this.step = step;
     }
 
     public AxisValueFormatter getAxisValueFormatter() {

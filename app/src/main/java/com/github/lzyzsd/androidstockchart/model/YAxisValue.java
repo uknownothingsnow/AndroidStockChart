@@ -3,13 +3,13 @@ package com.github.lzyzsd.androidstockchart.model;
 /**
  * Created by Bruce on 3/3/15.
  */
-public class AxisValue {
+public class YAxisValue {
     private float value;
     private int labelColor;
     //对应坐标
     private float position;
 
-    public AxisValue(float value, int lineColor, float position) {
+    public YAxisValue(float value, int lineColor, float position) {
         setValue(value);
         setLabelColor(lineColor);
         setPosition(position);
