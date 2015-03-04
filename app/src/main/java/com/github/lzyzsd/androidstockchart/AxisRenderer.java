@@ -49,7 +49,7 @@ public class AxisRenderer {
         this.chartView = chartView;
 
         for (int i = 0; i < 4; i++) {
-            linePaints[i].setColor(AXIS_LINE_COLOR);
+            linePaints[i].setColor(lineColor);
             labelPaints[i].setColor(AXIS_LABEL_COLOR_WHITE);
             labelPaints[i].setTextSize(labelTextSize);
         }
@@ -128,7 +128,7 @@ public class AxisRenderer {
         Paint paint = linePaints[LEFT];
 
         YAxisValue firstValue = axis.getValues().get(0);
-        paint.setColor(AXIS_BORDER_COLOR);
+        paint.setColor(borderColor);
         canvas.drawLine(0, firstValue.getPosition(), chartView.getWidth(), firstValue.getPosition(), linePaints[LEFT]);
         drawLeftAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
         drawRightAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
@@ -142,7 +142,7 @@ public class AxisRenderer {
             drawRightAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
         }
 
-        paint.setColor(AXIS_BORDER_COLOR);
+        paint.setColor(borderColor);
         YAxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
         canvas.drawLine(0, lastValue.getPosition(), chartView.getWidth(), lastValue.getPosition(), paint);
         drawLeftAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
