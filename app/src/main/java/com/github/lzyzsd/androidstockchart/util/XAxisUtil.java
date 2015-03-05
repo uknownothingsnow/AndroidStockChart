@@ -40,10 +40,6 @@ public class XAxisUtil {
         }
     }
 
-    public static long getCellsNumber() {
-        return 11;
-    }
-
     public static long getCellSize() {
         return 7200_000;
     }
