@@ -103,21 +103,8 @@ public class AxisRenderer {
                     color = AXIS_LABEL_COLOR_GREEN;
                 }
             }
-            values.add(new AxisValue<Float>(max - i * step, color, chartView.getCellHeight() * i));
+            values.add(new AxisValue<>(max - i * step, color, chartView.getCellHeight() * i));
         }
-    }
-
-    public void generateBottomAxisValues() {
-        LineChartData chartData = chartView.getChartData();
-        Axis axis = chartData.getAxisXBottom();
-        List<AxisValue> values = axis.getValues();
-        long start = chartData.getLines().get(0).getPoints().get(0).x;
-        for (int i = 0; i < axis.getCellNumber(); i++) {
-            values.add(new AxisValue(start + i * xStepSize, AXIS_LINE_COLOR, i * chartView.getCellWidth()));
-        }
-        int cells = axis.getCellNumber();
-        //最后一条垂直的线不x坐标减一，不然显示不出来
-        values.add(new AxisValue(start + cells * xStepSize, AXIS_LINE_COLOR, cells * chartView.getCellWidth() - 1));
     }
 
     public void drawHorizontalLines(Canvas canvas) {
@@ -131,16 +118,13 @@ public class AxisRenderer {
         drawLeftAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
         drawRightAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
 
-        paint.setColor(AXIS_LINE_COLOR);
         for (int i = 1; i < axis.getValues().size() - 1; i++) {
             AxisValue<Float> YAxisValue = axis.getValues().get(i);
             float labelY = YAxisValue.getPosition() - (axisLabelAscent + axisLabelDecent) / 2;
-            canvas.drawLine(0, YAxisValue.getPosition(), chartView.getWidth(), YAxisValue.getPosition(), paint);
             drawLeftAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
             drawRightAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
         }
 
-        paint.setColor(borderColor);
         AxisValue<Float> lastValue = axis.getValues().get(axis.getValues().size() - 1);
         canvas.drawLine(0, lastValue.getPosition(), chartView.getWidth(), lastValue.getPosition(), paint);
         drawLeftAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
@@ -164,32 +148,16 @@ public class AxisRenderer {
     }
 
     public void drawVerticalLines(Canvas canvas) {
-        Axis<Long> axis = chartView.getChartData().getAxisXBottom();
-
         Paint labelPaint = labelPaints[BOTTOM];
         Paint linePaint = linePaints[BOTTOM];
 
-        AxisValue firstValue = axis.getValues().get(0);
-        linePaint.setColor(AXIS_BORDER_COLOR);
-        canvas.drawLine(firstValue.getPosition(), 0, firstValue.getPosition(), chartView.getContentHeight(), linePaint);
+        linePaint.setColor(borderColor);
+        canvas.drawLine(0, 0, 0, chartView.getContentHeight(), linePaint);
+        String text = "06:00";
+        drawBottomAxisLabel(text, 0, chartView.getHeight(), canvas);
 
-        String text = axis.getAxisValueFormatter().format(firstValue);
-        drawBottomAxisLabel(text, firstValue.getPosition(), chartView.getHeight(), canvas);
-
-        linePaint.setColor(AXIS_LINE_COLOR);
-        for (int i = 1; i < axis.getValues().size() - 1; i++) {
-            AxisValue axisValue = axis.getValues().get(i);
-            canvas.drawLine(axisValue.getPosition(), 0, axisValue.getPosition(), chartView.getContentHeight(), linePaint);
-            text = axis.getAxisValueFormatter().format(axisValue);
-            float xShift = labelPaint.measureText(text, 0, text.length()) / 2;
-            drawBottomAxisLabel(text, axisValue.getPosition() - xShift, chartView.getHeight(), canvas);
-        }
-
-        linePaint.setColor(AXIS_BORDER_COLOR);
-        AxisValue lastValue = axis.getValues().get(axis.getValues().size() - 1);
-        canvas.drawLine(lastValue.getPosition(), 0, lastValue.getPosition(), chartView.getContentHeight(), linePaint);
-
-        text = axis.getAxisValueFormatter().format(lastValue);
+        canvas.drawLine(chartView.getWidth() - 1, 0, chartView.getWidth() - 1, chartView.getContentHeight(), linePaint);
+        text = "16:00";
         drawBottomAxisLabel(text, chartView.getWidth() - labelPaint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);
     }
 

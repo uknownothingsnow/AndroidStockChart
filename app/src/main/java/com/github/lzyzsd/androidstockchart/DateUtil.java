@@ -30,4 +30,25 @@ public class DateUtil {
     public static String format_hh_mm(long value) {
         return format_hh_mm(new DateTime(value));
     }
+
+    public static int getTradeStartMinuteFromBondCategory(String bondCategory) {
+        String[] ranges = bondCategory.split(";");
+        return Integer.parseInt(ranges[0].split("-")[0]);
+    }
+
+    public static int getTradeEndMinuteFromBondCategory(String bondCategory) {
+        String[] ranges = bondCategory.split(";");
+        return Integer.parseInt(ranges[ranges.length - 1].split("-")[1]);
+    }
+
+    public static int getPoints4OneTradeDayFromBondCategory(String bondCategory) {
+        String[] ranges = bondCategory.split(";");
+        int value = 0;
+        for (String range : ranges) {
+            String[] temp = range.split("-");
+            value += (Integer.parseInt(temp[1]) - Integer.parseInt(temp[0]));
+        }
+
+        return value;
+    }
 }

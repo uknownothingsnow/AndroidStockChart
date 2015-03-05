@@ -12,7 +12,6 @@ import android.view.SurfaceView;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,6 +31,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private int horizontalLinesNumber = 7;
     private float preClose = 3257f;
     private float[] leftAxisValues = new float[horizontalLinesNumber];
+
+    private String bondCategory = "360-1440;0-240";
 
     private LineChartData chartData = new LineChartData();
 
@@ -68,7 +69,6 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         this.chartData = chartData;
         axisRenderer.setMinMaxValue();
         axisRenderer.generateLeftAxisValues();
-        axisRenderer.generateBottomAxisValues();
     }
 
     public float getContentHeight() {
@@ -89,6 +89,14 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     public List<Line> getLines() {
         return chartData.getLines();
+    }
+
+    public void setBondCategory(String bondCategory) {
+        this.bondCategory = bondCategory;
+    }
+
+    public String getBondCategory() {
+        return bondCategory;
     }
 
     @Override
@@ -186,24 +194,21 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     Path path = new Path();
     private void drawPoints(Canvas canvas, List<Point> points) {
-        path.moveTo(computeRawX(points.get(0).x), computeRawY(points.get(0).y));
+        path.moveTo(computeRawX(0), computeRawY(points.get(0).y));
         for (int i = 1; i < points.size(); i++) {
-            path.lineTo(computeRawX(points.get(i).x), computeRawY(points.get(i).y));
+            path.lineTo(computeRawX(i), computeRawY(points.get(i).y));
         }
 
         canvas.drawPath(path, chartLinePaint);
         path.reset();
     }
 
-    private float computeRawX(long x) {
-        long start = chartData.getLines().get(0).getPoints().get(0).x;
-        float cellPosition =  (x - start) / (float) axisRenderer.getxStepSize();
-        return cellPosition * getCellWidth();
+    private float computeRawX(int position) {
+        int totalPoints = DateUtil.getPoints4OneTradeDayFromBondCategory(bondCategory);
+        return (getWidth() / (float) (totalPoints - 1)) * position;
     }
 
     private float computeRawY(float y) {
         return (axisRenderer.getMax() - y) / (axisRenderer.getMax() - axisRenderer.getMin()) * contentHeight;
     }
-
-
 }
