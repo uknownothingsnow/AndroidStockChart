@@ -26,16 +26,16 @@ public class XAxisUtil {
 
     public static long getEndValue() {
         DateTime dateTime = DateTime.now();
-        if (dateTime.getHourOfDay() < 16) {
+        if (dateTime.getHourOfDay() < 6) {
             return dateTime
                     .withTimeAtStartOfDay()
-                    .withField(DateTimeFieldType.hourOfDay(), 16)
+                    .withField(DateTimeFieldType.hourOfDay(), 4)
                     .getMillis();
         } else {
             return dateTime
                     .withFieldAdded(DurationFieldType.days(), 1)
                     .withTimeAtStartOfDay()
-                    .withField(DateTimeFieldType.hourOfDay(), 6)
+                    .withField(DateTimeFieldType.hourOfDay(), 4)
                     .getMillis();
         }
     }
