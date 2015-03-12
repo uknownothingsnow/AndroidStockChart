@@ -79,4 +79,12 @@ public class Axis<T> {
     public void setAxisValueFormatter(AxisValueFormatter axisValueFormatter) {
         this.axisValueFormatter = axisValueFormatter;
     }
+
+    public String format(AxisValue<T> axisValue) {
+        if (axisValueFormatter == null) {
+            return "";
+        }
+
+        return axisValueFormatter.format(axisValue);
+    }
 }

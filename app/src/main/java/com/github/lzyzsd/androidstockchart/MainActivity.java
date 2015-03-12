@@ -150,33 +150,43 @@ public class MainActivity extends ActionBarActivity {
                         isFetching.set(false);
                         progressBar.setVisibility(View.GONE);
                         chartView.setPreClose(quoteDataList.info.preclose);
-                        List<Line> lines = new ArrayList<>();
-                        List<Point> points = convertQuotesToPoints(quoteDataList.data, quoteDataList.info.preclose);
-                        Line line = new Line(points);
-                        lines.add(line);
-                        Line avgLine = AvgComputator.getAvgLine(line);
-                        avgLine.setColor(Color.BLUE);
-                        lines.add(avgLine);
-                        LineChartData lineChartData = new LineChartData(lines);
-                        Axis<Float> leftYAxis = new Axis<>();
-                        Axis<Long> bottomAxis = new Axis<>();
-                        bottomAxis.setMin(XAxisUtil.getStartValue());
-                        bottomAxis.setMax(XAxisUtil.getEndValue());
-                        bottomAxis.setStep(XAxisUtil.getCellSize());
-                        bottomAxis.setAxisValueFormatter(new AxisValueFormatter<AxisValue<Long>>() {
-                            @Override
-                            public String format(AxisValue<Long> axisValue) {
-                                return DateUtil.format_hh_mm(axisValue.getValue());
-                            }
-                        });
-                        lineChartData.setAxisYLeft(leftYAxis);
-                        lineChartData.setAxisXBottom(bottomAxis);
+                        LineChartData lineChartData = buildChartData(quoteDataList);
                         chartView.setChartData(lineChartData);
                     }
                 });
     }
 
-    private ArrayList<Point> convertQuotesToPoints(ArrayList<QuoteData> quotes, float preClose) {
+    private LineChartData buildChartData(QuoteDataList quoteDataList) {
+        List<Line> lines = new ArrayList<>();
+        List<Point> points = convertQuotesToPoints(quoteDataList.data);
+        Line line = new Line(points);
+        lines.add(line);
+        Line avgLine = AvgComputator.getAvgLine(line);
+        avgLine.setColor(Color.BLUE);
+        lines.add(avgLine);
+
+        LineChartData lineChartData = new LineChartData(lines);
+
+        Axis<Float> leftYAxis = new Axis<>();
+        Axis<Long> bottomAxis = new Axis<>();
+        List<AxisValue<Long>> bottomAxisValues = new ArrayList<>();
+        AxisValue<Long> start = new AxisValue<>((long) DateUtil.getTradeStartMinuteFromBondCategory(selectedCategory.bondCategory));
+        AxisValue<Long> end = new AxisValue<>((long)DateUtil.getTradeEndMinuteFromBondCategory(selectedCategory.bondCategory));
+        bottomAxisValues.add(start);
+        bottomAxisValues.add(end);
+        bottomAxis.setValues(bottomAxisValues);
+        bottomAxis.setAxisValueFormatter(new AxisValueFormatter<AxisValue<Long>>() {
+            @Override
+            public String format(AxisValue<Long> axisValue) {
+                return String.format("%02d:00", axisValue.getValue() / 60);
+            }
+        });
+        lineChartData.setAxisYLeft(leftYAxis);
+        lineChartData.setAxisXBottom(bottomAxis);
+        return lineChartData;
+    }
+
+    private ArrayList<Point> convertQuotesToPoints(ArrayList<QuoteData> quotes) {
         ArrayList<Point> points = new ArrayList<>(quotes.size());
         //数据最前面的零值需要设置为第一个非零值6
         int firstNonZeroPosition = 0;

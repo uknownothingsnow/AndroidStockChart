@@ -147,16 +147,20 @@ public class AxisRenderer {
     }
 
     public void drawVerticalLines(Canvas canvas) {
+        Axis<Long> bottomAxis = chartView.getChartData().getAxisXBottom();
+        if (bottomAxis == null || bottomAxis.getValues() == null || bottomAxis.getValues().size() < 2) {
+            return;
+        }
         Paint labelPaint = labelPaints[BOTTOM];
         Paint linePaint = linePaints[BOTTOM];
 
         linePaint.setColor(borderColor);
         canvas.drawLine(0, 0, 0, chartView.getContentHeight(), linePaint);
-        String text = chartView.getStartLabel();
+        String text = bottomAxis.format(bottomAxis.getValues().get(0));
         drawBottomAxisLabel(text, 0, chartView.getHeight(), canvas);
 
         canvas.drawLine(chartView.getWidth() - 1, 0, chartView.getWidth() - 1, chartView.getContentHeight(), linePaint);
-        text = chartView.getEndLabel();
+        text = bottomAxis.format(bottomAxis.getValues().get(1));
         drawBottomAxisLabel(text, chartView.getWidth() - labelPaint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);
     }
 

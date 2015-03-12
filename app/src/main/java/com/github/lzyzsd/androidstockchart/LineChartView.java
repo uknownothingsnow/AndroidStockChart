@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class LineChartView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     private static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#2a2e36");
-    private static final int CHART_LINE_COLOR = Color.RED;
+    public static final int CHART_LINE_COLOR = Color.RED;
 
     private SurfaceHolder holder;
     private Canvas canvas;
@@ -30,11 +30,9 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private boolean isRunning;
 
     private int horizontalLinesNumber = 7;
-    private float preClose = 3257f;
-    private float[] leftAxisValues = new float[horizontalLinesNumber];
+    private float preClose = 0f;
 
     String bondCategory;
-    String startLabel, endLabel;
 
     private LineChartData chartData = new LineChartData();
 
@@ -81,10 +79,6 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         return horizontalLinesNumber;
     }
 
-    public float[] getLeftAxisValues() {
-        return leftAxisValues;
-    }
-
     public float getPreClose() {
         return preClose;
     }
@@ -95,28 +89,10 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     public void setBondCategory(String bondCategory) {
         this.bondCategory = bondCategory;
-        startLabel = DateUtil.getStartLabelFromBondCategory(bondCategory);
-        endLabel = DateUtil.getEndLabelFromBondCategory(bondCategory);
     }
 
     public String getBondCategory() {
         return bondCategory;
-    }
-
-    public String getStartLabel() {
-        return startLabel;
-    }
-
-    public void setStartLabel(String startLabel) {
-        this.startLabel = startLabel;
-    }
-
-    public String getEndLabel() {
-        return endLabel;
-    }
-
-    public void setEndLabel(String endLabel) {
-        this.endLabel = endLabel;
     }
 
     @Override
