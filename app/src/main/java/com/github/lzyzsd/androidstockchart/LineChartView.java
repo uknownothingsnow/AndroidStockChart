@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.github.lzyzsd.androidstockchart.model.Axis;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 
@@ -96,8 +95,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     public void setBondCategory(String bondCategory) {
         this.bondCategory = bondCategory;
-        startLabel = DateUtil.getTradeStartLabelFromBondCategory(bondCategory);
-        endLabel = DateUtil.getTradeEndLabelFromBondCategory(bondCategory);
+        startLabel = DateUtil.getStartLabelFromBondCategory(bondCategory);
+        endLabel = DateUtil.getEndLabelFromBondCategory(bondCategory);
     }
 
     public String getBondCategory() {

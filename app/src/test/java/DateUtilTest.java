@@ -28,4 +28,16 @@ public class DateUtilTest {
     @Test
     public void should_format_hh_mm_fail() {
     }
+
+    @Test
+    public void test_getStartLabelFromBondCategory() {
+        String lablel = DateUtil.getStartLabelFromBondCategory("360-1440;0-240");
+        assertThat(lablel).isEqualTo("06:00");
+    }
+
+    @Test
+    public void test_getEndLabelFromBondCategory() {
+        String lablel = DateUtil.getEndLabelFromBondCategory("360-1440;0-240");
+        assertThat(lablel).isEqualTo("04:00");
+    }
 }
