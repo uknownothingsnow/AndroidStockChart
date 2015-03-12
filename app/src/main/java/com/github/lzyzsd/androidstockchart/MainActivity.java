@@ -45,17 +45,12 @@ import rx.android.observables.AndroidObservable;
 
 public class MainActivity extends ActionBarActivity {
 
-    ProgressBar progressBar;
-
-    private Runnable runnable;
-
     final Category[] categories = new Category[] {
         new Category("TPME.XAGUSD", "现货白银", "360-1440;0-240"),
         new Category("INAU.XAU", "伦敦金", "360-1440;0-360"),
         new Category("INAU.XAG", "伦敦银", "360-1440;0-360"),
         new Category("SGE.AGT+D", "白银延期", "1260-1440;0-150;540-690;810-930")
     };
-
     ArrayAdapter<Category> spinnerArrayAdapter;
 
     private Category selectedCategory = categories[0];
@@ -63,38 +58,23 @@ public class MainActivity extends ActionBarActivity {
     private AtomicBoolean isFetching = new AtomicBoolean(false);
 
     LineChartView chartView;
+    ProgressBar progressBar;
+
+    QuoteService quoteService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-
         chartView = (LineChartView) findViewById(R.id.chart_view);
+        chartView.setBondCategory(selectedCategory.bondCategory);
 
-        Spinner spinner = (Spinner) findViewById(R.id.spinner);
-        initSpinner(spinner);
+        initSpinner();
+        initQuoteService();
 
-        Gson gson = new GsonBuilder()
-                .registerTypeAdapter(DateTime.class, new QuoteData.DateTimeTypeAdapter())
-                .create();
-        RestAdapter.Builder builder = new RestAdapter.Builder();
-        RestAdapter restAdapter = builder.setClient(new OkClient())
-                .setEndpoint("http://api.baidao.com")
-                .setLogLevel(RestAdapter.LogLevel.HEADERS)
-                .setConverter(new GsonConverter(gson))
-                .build();
-        final QuoteService quoteService = restAdapter.create(QuoteService.class);
-
-        runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (isFetching.compareAndSet(false, true)) {
-                    progressBar.setVisibility(View.VISIBLE);
-                    fetch(chartView, quoteService);
-                }
-            }
-        };
+        fetch();
 
 //        Timer timer = new Timer();
 //        timer.scheduleAtFixedRate(new TimerTask() {
@@ -105,7 +85,21 @@ public class MainActivity extends ActionBarActivity {
 //        }, 0, 10_000);
     }
 
-    private void initSpinner(Spinner spinner) {
+    private void initQuoteService() {
+        Gson gson = new GsonBuilder()
+                .registerTypeAdapter(DateTime.class, new QuoteData.DateTimeTypeAdapter())
+                .create();
+        RestAdapter.Builder builder = new RestAdapter.Builder();
+        RestAdapter restAdapter = builder.setClient(new OkClient())
+                .setEndpoint("http://api.baidao.com")
+                .setLogLevel(RestAdapter.LogLevel.HEADERS)
+                .setConverter(new GsonConverter(gson))
+                .build();
+        quoteService = restAdapter.create(QuoteService.class);
+    }
+
+    private void initSpinner() {
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
         spinnerArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, categories);
         spinner.setAdapter(spinnerArrayAdapter);
         if (Build.VERSION.SDK_INT >= 17) {
@@ -120,13 +114,7 @@ public class MainActivity extends ActionBarActivity {
                 }
                 selectedCategory = category;
                 chartView.setBondCategory(selectedCategory.bondCategory);
-
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        runOnUiThread(runnable);
-                    }
-                }).start();
+                fetch();
             }
 
             @Override
@@ -136,7 +124,12 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    private void fetch(final LineChartView chartView, QuoteService quoteService) {
+    private void fetch() {
+        if (isFetching.compareAndSet(false, true)) {
+            progressBar.setVisibility(View.VISIBLE);
+        } else {
+            return;
+        }
         String dateStr = DateTime.now().toString("YYYYMMDDHHmmss");
         AndroidObservable.bindActivity(this, quoteService.getQuote(selectedCategory.id, 1, dateStr))
                 .subscribe(new Subscriber<QuoteDataList>() {

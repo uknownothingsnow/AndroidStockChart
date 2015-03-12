@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -33,8 +34,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private float preClose = 3257f;
     private float[] leftAxisValues = new float[horizontalLinesNumber];
 
-    private String bondCategory = "360-1440;0-240";
-    private String startLabel, endLabel;
+    String bondCategory;
+    String startLabel, endLabel;
 
     private LineChartData chartData = new LineChartData();
 
@@ -154,7 +155,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     public void run() {
         while (isRunning )
         {
-            if (chartData.getLines().size() == 0) {
+            if (chartData.getLines().size() == 0 && TextUtils.isEmpty(bondCategory)) {
                 try {
                     thread.sleep(100);
                 } catch (InterruptedException e) {

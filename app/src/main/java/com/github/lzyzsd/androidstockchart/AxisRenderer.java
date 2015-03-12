@@ -105,6 +105,9 @@ public class AxisRenderer {
 
     public void drawHorizontalLines(Canvas canvas) {
         Axis<Float> axis = chartView.getChartData().getAxisYLeft();
+        if (axis == null || axis.getValues() == null || axis.getValues().size() == 0) {
+            return;
+        }
 
         Paint paint = linePaints[LEFT];
 
