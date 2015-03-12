@@ -9,6 +9,7 @@ import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.github.lzyzsd.androidstockchart.model.Axis;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 
@@ -33,6 +34,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private float[] leftAxisValues = new float[horizontalLinesNumber];
 
     private String bondCategory = "360-1440;0-240";
+    private String startLabel, endLabel;
 
     private LineChartData chartData = new LineChartData();
 
@@ -93,10 +95,28 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     public void setBondCategory(String bondCategory) {
         this.bondCategory = bondCategory;
+        startLabel = DateUtil.getTradeStartLabelFromBondCategory(bondCategory);
+        endLabel = DateUtil.getTradeEndLabelFromBondCategory(bondCategory);
     }
 
     public String getBondCategory() {
         return bondCategory;
+    }
+
+    public String getStartLabel() {
+        return startLabel;
+    }
+
+    public void setStartLabel(String startLabel) {
+        this.startLabel = startLabel;
+    }
+
+    public String getEndLabel() {
+        return endLabel;
+    }
+
+    public void setEndLabel(String endLabel) {
+        this.endLabel = endLabel;
     }
 
     @Override

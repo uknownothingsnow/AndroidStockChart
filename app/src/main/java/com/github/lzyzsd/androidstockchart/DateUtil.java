@@ -51,4 +51,14 @@ public class DateUtil {
 
         return value;
     }
+
+    public static String getTradeStartLabelFromBondCategory(String bondCategory) {
+        int start = getTradeStartMinuteFromBondCategory(bondCategory) / 60;
+        return String.format("%02d:00", start);
+    }
+
+    public static String getTradeEndLabelFromBondCategory(String bondCategory) {
+        int end = getTradeEndMinuteFromBondCategory(bondCategory) / 60;
+        return String.format("%02d:00", end);
+    }
 }

@@ -56,10 +56,6 @@ public class AxisRenderer {
         axisLabelDecent = labelPaints[0].descent();
     }
 
-    public long getxStepSize() {
-        return xStepSize;
-    }
-
     public float getMin() {
         return min;
     }
@@ -153,11 +149,11 @@ public class AxisRenderer {
 
         linePaint.setColor(borderColor);
         canvas.drawLine(0, 0, 0, chartView.getContentHeight(), linePaint);
-        String text = "06:00";
+        String text = chartView.getStartLabel();
         drawBottomAxisLabel(text, 0, chartView.getHeight(), canvas);
 
         canvas.drawLine(chartView.getWidth() - 1, 0, chartView.getWidth() - 1, chartView.getContentHeight(), linePaint);
-        text = "16:00";
+        text = chartView.getEndLabel();
         drawBottomAxisLabel(text, chartView.getWidth() - labelPaint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);
     }
 

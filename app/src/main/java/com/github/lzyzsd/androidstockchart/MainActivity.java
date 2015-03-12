@@ -49,8 +49,20 @@ public class MainActivity extends ActionBarActivity {
 
     private Runnable runnable;
 
-    private String selectedId = "TPME.XAGUSD";
+    final Category[] categories = new Category[] {
+        new Category("TPME.XAGUSD", "现货白银", "360-1440;0-240"),
+        new Category("INAU.XAU", "伦敦金", "360-1440;0-360"),
+        new Category("INAU.XAG", "伦敦银", "360-1440;0-360"),
+        new Category("SGE.AGT+D", "白银延期", "1260-1440;0-150;540-690;810-930")
+    };
+
+    ArrayAdapter<Category> spinnerArrayAdapter;
+
+    private Category selectedCategory = categories[0];
+
     private AtomicBoolean isFetching = new AtomicBoolean(false);
+
+    LineChartView chartView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +70,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
-        final LineChartView chartView = (LineChartView) findViewById(R.id.chart_view);
+        chartView = (LineChartView) findViewById(R.id.chart_view);
 
         Spinner spinner = (Spinner) findViewById(R.id.spinner);
         initSpinner(spinner);
@@ -94,14 +106,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void initSpinner(Spinner spinner) {
-        final ArrayAdapter<Category> spinnerArrayAdapter = new ArrayAdapter(this,
-                android.R.layout.simple_spinner_item, new Category[] {
-                new Category("TPME.XAGUSD", "现货白银"),
-                new Category("INAU.XAU", "伦敦金"),
-                new Category("INAU.XAG", "伦敦银"),
-                new Category("SGE.AGT+D", "白银延期")
-        });
-
+        spinnerArrayAdapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, categories);
         spinner.setAdapter(spinnerArrayAdapter);
         if (Build.VERSION.SDK_INT >= 17) {
             spinner.setDropDownVerticalOffset(40);
@@ -110,10 +115,12 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Category category = spinnerArrayAdapter.getItem(position);
-                if (selectedId.equals(category.id)) {
+                if (selectedCategory.id.equals(category.id)) {
                     return;
                 }
-                selectedId = category.id;
+                selectedCategory = category;
+                chartView.setBondCategory(selectedCategory.bondCategory);
+
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
@@ -131,7 +138,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void fetch(final LineChartView chartView, QuoteService quoteService) {
         String dateStr = DateTime.now().toString("YYYYMMDDHHmmss");
-        AndroidObservable.bindActivity(this, quoteService.getQuote(selectedId, 1, dateStr))
+        AndroidObservable.bindActivity(this, quoteService.getQuote(selectedCategory.id, 1, dateStr))
                 .subscribe(new Subscriber<QuoteDataList>() {
                     @Override
                     public void onCompleted() {
@@ -230,10 +237,12 @@ public class MainActivity extends ActionBarActivity {
     public class Category {
         String id;
         String name;
+        String bondCategory;
 
-        public Category(String id, String name) {
+        public Category(String id, String name, String bondCategory) {
             this.id = id;
             this.name = name;
+            this.bondCategory = bondCategory;
         }
 
         @Override
@@ -242,18 +251,4 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    public class MySpinnerAdapter extends ArrayAdapter<Category> {
-
-        public MySpinnerAdapter(Context context, int resource) {
-            super(context, resource);
-        }
-
-        @Override
-        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-            View view = super.getDropDownView(position, convertView, parent);
-            Category category = this.getItem(position);
-            ((TextView) view.findViewById(R.id.textview)).setText(category.name);
-            return view;
-        }
-    }
 }
