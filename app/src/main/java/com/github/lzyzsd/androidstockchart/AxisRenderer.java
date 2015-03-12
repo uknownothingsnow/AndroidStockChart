@@ -118,12 +118,16 @@ public class AxisRenderer {
         drawRightAxisLabel(firstValue.getPosition() - axisLabelAscent, firstValue.getValue(), firstValue.getLabelColor(), canvas);
 
         for (int i = 1; i < axis.getValues().size() - 1; i++) {
-            AxisValue<Float> YAxisValue = axis.getValues().get(i);
-            float labelY = YAxisValue.getPosition() - (axisLabelAscent + axisLabelDecent) / 2;
-            drawLeftAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
-            drawRightAxisLabel(labelY, YAxisValue.getValue(), YAxisValue.getLabelColor(), canvas);
+            AxisValue<Float> yAxisValue = axis.getValues().get(i);
+            float yPos = yAxisValue.getPosition();
+            paint.setColor(lineColor);
+            canvas.drawLine(0, yPos, chartView.getWidth(), yPos, linePaints[LEFT]);
+            float labelY = yPos - (axisLabelAscent + axisLabelDecent) / 2;
+            drawLeftAxisLabel(labelY, yAxisValue.getValue(), yAxisValue.getLabelColor(), canvas);
+            drawRightAxisLabel(labelY, yAxisValue.getValue(), yAxisValue.getLabelColor(), canvas);
         }
 
+        paint.setColor(borderColor);
         AxisValue<Float> lastValue = axis.getValues().get(axis.getValues().size() - 1);
         canvas.drawLine(0, lastValue.getPosition(), chartView.getWidth(), lastValue.getPosition(), paint);
         drawLeftAxisLabel(lastValue.getPosition(), lastValue.getValue(), lastValue.getLabelColor(), canvas);
@@ -159,6 +163,13 @@ public class AxisRenderer {
         String text = bottomAxis.format(bottomAxis.getValues().get(0));
         drawBottomAxisLabel(text, 0, chartView.getHeight(), canvas);
 
+        float cellWidth = chartView.getCellWidth();
+        linePaint.setColor(lineColor);
+        for (int i = 1; i < chartView.getVerticalLinesNumber(); i++) {
+            canvas.drawLine(i * cellWidth, 0, i * cellWidth, chartView.getContentHeight(), linePaint);
+        }
+
+        linePaint.setColor(borderColor);
         canvas.drawLine(chartView.getWidth() - 1, 0, chartView.getWidth() - 1, chartView.getContentHeight(), linePaint);
         text = bottomAxis.format(bottomAxis.getValues().get(1));
         drawBottomAxisLabel(text, chartView.getWidth() - labelPaint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);

@@ -30,6 +30,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     private boolean isRunning;
 
     private int horizontalLinesNumber = 7;
+    private int verticalLinesNumber = 11;
     private float preClose = 0f;
 
     String bondCategory;
@@ -77,6 +78,10 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
 
     public int getHorizontalLinesNumber() {
         return horizontalLinesNumber;
+    }
+
+    public int getVerticalLinesNumber() {
+        return verticalLinesNumber;
     }
 
     public float getPreClose() {
@@ -174,7 +179,7 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public float getCellWidth() {
-        return getWidth() / (float) getChartData().getAxisXBottom().getCellNumber();
+        return getWidth() / (float) (verticalLinesNumber - 1);
     }
 
     public float getCellHeight() {
