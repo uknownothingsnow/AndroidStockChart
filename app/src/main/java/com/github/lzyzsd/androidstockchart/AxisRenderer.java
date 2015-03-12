@@ -38,7 +38,7 @@ public class AxisRenderer {
     private Paint[] labelPaints = new Paint[] {new Paint(), new Paint(), new Paint(), new Paint()};
 
     private float diff = 0;
-    private final float PADDING_VALUE = 30f;
+    private final float PADDING_VALUE = .3f;
     float min;// = preClose - diff - PADDING_VALUE;
     float max;// = preClose + diff + PADDING_VALUE;
     private long xStepSize = 7200000;
@@ -80,8 +80,8 @@ public class AxisRenderer {
         float preClose = chartView.getPreClose();
         diff = Math.max(Math.abs(min - preClose), Math.abs(max - preClose));
 
-        this.min = preClose - diff - PADDING_VALUE;
-        this.max = preClose + diff + PADDING_VALUE;
+        this.min = preClose - diff * (PADDING_VALUE + 1);
+        this.max = preClose + diff * (PADDING_VALUE + 1);
     }
 
     public void generateLeftAxisValues() {
