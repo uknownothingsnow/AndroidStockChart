@@ -53,12 +53,20 @@ public class DateUtil {
     }
 
     public static String getStartLabelFromBondCategory(String bondCategory) {
-        int start = getTradeStartMinuteFromBondCategory(bondCategory) / 60;
-        return String.format("%02d:00", start);
+        int value = getTradeStartMinuteFromBondCategory(bondCategory);
+        int hour = value / 60;
+        int minute = value % 60;
+
+        DateTime  dateTime = DateTime.now().withTimeAtStartOfDay().withHourOfDay(hour).withMinuteOfHour(minute);
+        return dateTime.toString("HH:mm");
     }
 
     public static String getEndLabelFromBondCategory(String bondCategory) {
-        int end = getTradeEndMinuteFromBondCategory(bondCategory) / 60;
-        return String.format("%02d:00", end);
+        int value = getTradeEndMinuteFromBondCategory(bondCategory);
+        int hour = value / 60;
+        int minute = value % 60;
+
+        DateTime  dateTime = DateTime.now().withTimeAtStartOfDay().withHourOfDay(hour).withMinuteOfHour(minute);
+        return dateTime.toString("HH:mm");
     }
 }

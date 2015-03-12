@@ -30,14 +30,20 @@ public class DateUtilTest {
     }
 
     @Test
+    public void test_getPoints4OneTradeDayFromBondCategory() {
+        int size = DateUtil.getPoints4OneTradeDayFromBondCategory("1260-1440;0-150;540-690;810-930");
+        assertThat(size).isEqualTo(600);
+    }
+
+    @Test
     public void test_getStartLabelFromBondCategory() {
-        String lablel = DateUtil.getStartLabelFromBondCategory("360-1440;0-240");
-        assertThat(lablel).isEqualTo("06:00");
+        String label = DateUtil.getStartLabelFromBondCategory("1260-1440;0-150;540-690;810-930");
+        assertThat(label).isEqualTo("21:00");
     }
 
     @Test
     public void test_getEndLabelFromBondCategory() {
-        String lablel = DateUtil.getEndLabelFromBondCategory("360-1440;0-240");
-        assertThat(lablel).isEqualTo("04:00");
+        String label = DateUtil.getEndLabelFromBondCategory("1260-1440;0-150;540-690;810-930");
+        assertThat(label).isEqualTo("15:30");
     }
 }

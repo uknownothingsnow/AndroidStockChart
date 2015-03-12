@@ -178,7 +178,11 @@ public class MainActivity extends ActionBarActivity {
         bottomAxis.setAxisValueFormatter(new AxisValueFormatter<AxisValue<Long>>() {
             @Override
             public String format(AxisValue<Long> axisValue) {
-                return String.format("%02d:00", axisValue.getValue() / 60);
+                int hour = axisValue.getValue().intValue() / 60;
+                int minute = axisValue.getValue().intValue() % 60;
+
+                DateTime  dateTime = DateTime.now().withTimeAtStartOfDay().withHourOfDay(hour).withMinuteOfHour(minute);
+                return dateTime.toString("hh:mm");
             }
         });
         lineChartData.setAxisYLeft(leftYAxis);
@@ -200,12 +204,16 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
+        float lastNonZeroValue = firstNonZeroValue;
         for (int i = 0; i < quotes.size(); i++) {
             QuoteData quoteData = quotes.get(i);
             if (i > firstNonZeroPosition) {
                 //数据中间的零值需要丢弃
                 if (quoteData.open > 0) {
+                    lastNonZeroValue = quoteData.open;
                     points.add(new Point(quoteData.updateTime.getMillis(), quoteData.open));
+                } else {
+                    points.add(new Point(quoteData.updateTime.getMillis(), lastNonZeroValue));
                 }
             } else {
                 points.add(new Point(quoteData.updateTime.getMillis(), firstNonZeroValue));
