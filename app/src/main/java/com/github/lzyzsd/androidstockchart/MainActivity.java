@@ -1,12 +1,22 @@
 package com.github.lzyzsd.androidstockchart;
 
+import android.content.Context;
+import android.database.DataSetObserver;
 import android.graphics.Color;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
 
 import com.github.lzyzsd.androidstockchart.formatter.AxisValueFormatter;
 import com.github.lzyzsd.androidstockchart.model.Axis;
@@ -20,9 +30,11 @@ import com.google.gson.GsonBuilder;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import retrofit.RestAdapter;
 import retrofit.client.OkClient;
@@ -37,6 +49,9 @@ public class MainActivity extends ActionBarActivity {
 
     private Runnable runnable;
 
+    private String selectedId = "TPME.XAGUSD";
+    private AtomicBoolean isFetching = new AtomicBoolean(false);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +59,9 @@ public class MainActivity extends ActionBarActivity {
         progressBar = (ProgressBar) findViewById(R.id.progress_bar);
 
         final LineChartView chartView = (LineChartView) findViewById(R.id.chart_view);
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        initSpinner(spinner);
 
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(DateTime.class, new QuoteData.DateTimeTypeAdapter())
@@ -59,23 +77,61 @@ public class MainActivity extends ActionBarActivity {
         runnable = new Runnable() {
             @Override
             public void run() {
-                progressBar.setVisibility(View.VISIBLE);
-                fetch(chartView, quoteService);
+                if (isFetching.compareAndSet(false, true)) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    fetch(chartView, quoteService);
+                }
             }
         };
 
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+//        Timer timer = new Timer();
+//        timer.scheduleAtFixedRate(new TimerTask() {
+//            @Override
+//            public void run() {
+//                runOnUiThread(runnable);
+//            }
+//        }, 0, 10_000);
+    }
+
+    private void initSpinner(Spinner spinner) {
+        final ArrayAdapter<Category> spinnerArrayAdapter = new ArrayAdapter(this,
+                android.R.layout.simple_spinner_item, new Category[] {
+                new Category("TPME.XAGUSD", "现货白银"),
+                new Category("INAU.XAU", "伦敦金"),
+                new Category("INAU.XAG", "伦敦银"),
+                new Category("SGE.AGT+D", "白银延期")
+        });
+
+        spinner.setAdapter(spinnerArrayAdapter);
+        if (Build.VERSION.SDK_INT >= 17) {
+            spinner.setDropDownVerticalOffset(40);
+        }
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void run() {
-                runOnUiThread(runnable);
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Category category = spinnerArrayAdapter.getItem(position);
+                if (selectedId.equals(category.id)) {
+                    return;
+                }
+                selectedId = category.id;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        runOnUiThread(runnable);
+                    }
+                }).start();
             }
-        }, 0, 10_000);
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     private void fetch(final LineChartView chartView, QuoteService quoteService) {
         String dateStr = DateTime.now().toString("YYYYMMDDHHmmss");
-        AndroidObservable.bindActivity(this, quoteService.getQuote("TPME.XAGUSD", 1, dateStr))
+        AndroidObservable.bindActivity(this, quoteService.getQuote(selectedId, 1, dateStr))
                 .subscribe(new Subscriber<QuoteDataList>() {
                     @Override
                     public void onCompleted() {
@@ -84,12 +140,14 @@ public class MainActivity extends ActionBarActivity {
 
                     @Override
                     public void onError(Throwable e) {
+                        isFetching.set(false);
                         e.printStackTrace();
                         progressBar.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void onNext(QuoteDataList quoteDataList) {
+                        isFetching.set(false);
                         progressBar.setVisibility(View.GONE);
                         chartView.setPreClose(quoteDataList.info.preclose);
                         List<Line> lines = new ArrayList<>();
@@ -167,5 +225,35 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public class Category {
+        String id;
+        String name;
+
+        public Category(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    public class MySpinnerAdapter extends ArrayAdapter<Category> {
+
+        public MySpinnerAdapter(Context context, int resource) {
+            super(context, resource);
+        }
+
+        @Override
+        public View getDropDownView(int position, View convertView, ViewGroup parent) {
+            View view = super.getDropDownView(position, convertView, parent);
+            Category category = this.getItem(position);
+            ((TextView) view.findViewById(R.id.textview)).setText(category.name);
+            return view;
+        }
     }
 }
