@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.github.lzyzsd.androidstockchart.formatter.AxisValueFormatter;
 import com.github.lzyzsd.androidstockchart.model.Axis;
 import com.github.lzyzsd.androidstockchart.model.AxisValue;
+import com.github.lzyzsd.androidstockchart.model.ChartData;
 import com.github.lzyzsd.androidstockchart.model.Line;
 import com.github.lzyzsd.androidstockchart.model.LineChartData;
 import com.github.lzyzsd.androidstockchart.util.XAxisUtil;
@@ -62,6 +63,8 @@ public class MainActivity extends ActionBarActivity {
 
     QuoteService quoteService;
 
+    Timer timer = new Timer();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,16 +76,34 @@ public class MainActivity extends ActionBarActivity {
 
         initSpinner();
         initQuoteService();
+    }
 
-        fetch();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        schedule();
+    }
 
-//        Timer timer = new Timer();
-//        timer.scheduleAtFixedRate(new TimerTask() {
-//            @Override
-//            public void run() {
-//                runOnUiThread(runnable);
-//            }
-//        }, 0, 10_000);
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (timer != null) {
+            timer.cancel();
+        }
+    }
+
+    private void schedule() {
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        fetch();
+                    }
+                });
+            }
+        }, 0, 10_000);
     }
 
     private void initQuoteService() {
@@ -131,6 +152,16 @@ public class MainActivity extends ActionBarActivity {
             return;
         }
         String dateStr = DateTime.now().toString("YYYYMMDDHHmmss");
+        LineChartData chartData = chartView.getChartData();
+
+        if (chartData != null && chartData.getLines() != null && chartData.getLines().size() != 0) {
+            Line line = chartData.getLines().get(0);
+            if (line.getPoints() != null && line.getPoints().size() != 0) {
+                List<Point> points = line.getPoints();
+                Point point = points.get(points.size() - 1);
+                dateStr = new DateTime(point.x).toString("YYYYMMDDHHmmss");
+            }
+        }
         AndroidObservable.bindActivity(this, quoteService.getQuote(selectedCategory.id, 1, dateStr))
                 .subscribe(new Subscriber<QuoteDataList>() {
                     @Override
