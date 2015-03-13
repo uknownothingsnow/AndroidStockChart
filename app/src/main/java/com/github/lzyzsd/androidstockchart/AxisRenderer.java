@@ -64,6 +64,22 @@ public class AxisRenderer {
         return max;
     }
 
+    public int getBorderColor() {
+        return borderColor;
+    }
+
+    public void setBorderColor(int borderColor) {
+        this.borderColor = borderColor;
+    }
+
+    public int getLineColor() {
+        return lineColor;
+    }
+
+    public void setLineColor(int lineColor) {
+        this.lineColor = lineColor;
+    }
+
     public void setMinMaxValue() {
         float min = Float.MAX_VALUE, max = Float.MIN_VALUE;
         for (Line line: chartView.getLines()) {
@@ -172,6 +188,8 @@ public class AxisRenderer {
         linePaint.setColor(borderColor);
         canvas.drawLine(chartView.getWidth() - 1, 0, chartView.getWidth() - 1, chartView.getContentHeight(), linePaint);
         text = bottomAxis.format(bottomAxis.getValues().get(1));
+
+        labelPaints[BOTTOM].setColor(bottomAxis.getLabelColor());
         drawBottomAxisLabel(text, chartView.getWidth() - labelPaint.measureText(text, 0, text.length()), chartView.getHeight(), canvas);
     }
 

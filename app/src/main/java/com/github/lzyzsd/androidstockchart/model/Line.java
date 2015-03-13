@@ -11,7 +11,7 @@ import java.util.List;
  * Created by Bruce on 3/2/15.
  */
 public class Line {
-    private static final int DEFAULT_LINE_COLOR = Color.RED;
+    private static final int DEFAULT_LINE_COLOR = Color.parseColor("#ff6600");
     private int color = DEFAULT_LINE_COLOR;
     private List<Point> points = new ArrayList<>();
 

@@ -20,7 +20,8 @@ import java.util.List;
  */
 public class LineChartView extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     private static final int DEFAULT_BACKGROUND_COLOR = Color.parseColor("#2a2e36");
-    public static final int CHART_LINE_COLOR = Color.RED;
+    public static final int DEFAULT_BORDER_COLOR = Color.parseColor("#333232");
+    public static final int DEFAULT_GRID_LINE_COLOR = Color.parseColor("#3a3f48");
 
     private SurfaceHolder holder;
     private Canvas canvas;
@@ -56,6 +57,8 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         holder.addCallback(this);
 
         axisRenderer = new AxisRenderer(this);
+        axisRenderer.setBorderColor(DEFAULT_BORDER_COLOR);
+        axisRenderer.setLineColor(DEFAULT_GRID_LINE_COLOR);
     }
 
     public void setPreClose(float preClose) {
@@ -106,7 +109,6 @@ public class LineChartView extends SurfaceView implements SurfaceHolder.Callback
         paint.setColor(DEFAULT_BACKGROUND_COLOR);
 
         chartLinePaint = new Paint();
-        chartLinePaint.setColor(CHART_LINE_COLOR);
         chartLinePaint.setStyle(Paint.Style.STROKE);
 
         isRunning = true;

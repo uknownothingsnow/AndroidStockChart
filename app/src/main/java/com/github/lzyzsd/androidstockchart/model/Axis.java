@@ -13,6 +13,7 @@ import java.util.List;
 public class Axis<T> {
     private List<AxisValue<T>> values = new ArrayList<>();
     private int lineColor = Color.LTGRAY;
+    private int labelColor = Color.parseColor("#4e4f52");
     private long min, max, step;
     private AxisValueFormatter axisValueFormatter;
 
@@ -42,6 +43,14 @@ public class Axis<T> {
 
     public void setLineColor(int lineColor) {
         this.lineColor = lineColor;
+    }
+
+    public int getLabelColor() {
+        return labelColor;
+    }
+
+    public void setLabelColor(int labelColor) {
+        this.labelColor = labelColor;
     }
 
     public long getMin() {

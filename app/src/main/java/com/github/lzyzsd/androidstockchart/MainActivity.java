@@ -193,7 +193,7 @@ public class MainActivity extends ActionBarActivity {
         Line line = new Line(points);
         lines.add(line);
         Line avgLine = AvgComputator.getAvgLine(line);
-        avgLine.setColor(Color.BLUE);
+        avgLine.setColor(Color.parseColor("#93ac01"));
         lines.add(avgLine);
 
         LineChartData lineChartData = new LineChartData(lines);
